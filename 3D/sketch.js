@@ -64,8 +64,11 @@ settings.addRange("Size <br> (drawn at, not shown at)", 6, 50, 10, 1, function (
     size = value;
 });
 settings.addBoolean("Rotate", 0, function (value) {
-    theta = 0;
+    // theta = 0;
     spin = value;
+});
+settings.addButton("Reset angle", function () {
+    theta = 0;
 });
 
 function setup() {
@@ -122,8 +125,8 @@ function setup() {
 }
 
 function draw() {
+    rotateY(theta);
     if (spin) {
-        rotateY(theta);
         theta += 0.005;
     }
 
