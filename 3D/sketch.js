@@ -25,10 +25,10 @@ settings.addButton("Run", run);
 settings.addButton("Step", go);
 settings.addButton("Re-Generate", generate);
 settings.addButton("Reset map", reset);
-settings.addBoolean("Draw gizmo", true, function (value) {
+settings.addBoolean("Draw gizmo", true, (value) => {
     gizmo = value;
 });
-settings.addBoolean("Draw empty space", false, function (value) {
+settings.addBoolean("Draw empty space", false, (value) => {
     drawEmpty = value;
 });
 settings.addRange(
@@ -37,38 +37,43 @@ settings.addRange(
     2000,
     100,
     1,
-    function (value) {
+    (value) => {
         interval = value;
     }
 );
-settings.addRange("Map size (blocks³)", 1, 30, 10, 1, function (value) {
+settings.addRange("Map size (blocks³)", 1, 30, 10, 1, (value) => {
     amt = Math.pow(value, 3);
     xs = ~~Math.cbrt(amt);
     ys = xs;
     zs = xs;
     generate();
 });
-settings.addBoolean("Diagonal movement", true, function (value) {
+settings.addBoolean("Diagonal movement", true, (value) => {
     DIAGONALS = value;
 });
-settings.addRange("Max Walls", 0, 100, 10, 1, function (value) {
+settings.addRange("Max Walls", 0, 100, 10, 1, (value) => {
     MAXWALLS = value;
     generate();
 });
-settings.addRange("Min Walls", 0, 100, 10, 1, function (value) {
+settings.addRange("Min Walls", 0, 100, 10, 1, (value) => {
     MINWALLS = value;
     generate();
 });
-settings.addRange("Size <br> (drawn at, not shown at)", 6, 50, 10, 1, function (
-    value
-) {
-    size = value;
-});
-settings.addBoolean("Rotate", 0, function (value) {
+settings.addRange(
+    "Size <br> (drawn at, not shown at)",
+    6,
+    50,
+    10,
+    1,
+    (value) => {
+        size = value;
+    }
+);
+settings.addBoolean("Rotate", 0, (value) => {
     // theta = 0;
     spin = value;
 });
-settings.addButton("Reset angle", function () {
+settings.addButton("Reset angle", () => {
     theta = 0;
 });
 
