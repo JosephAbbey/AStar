@@ -23,7 +23,7 @@ var gizmo = 1,
 var settings = QuickSettings.create();
 settings.addButton("Run", run);
 settings.addButton("Step", go);
-settings.addButton("Re-Generate", setup);
+settings.addButton("Re-Generate", _setup);
 settings.addButton("Reset map", reset);
 settings.addBoolean("Draw gizmo", true, function (value) {
     gizmo = value;
@@ -46,18 +46,18 @@ settings.addRange("Map size (blocks³)", 1, 30, 10, 1, function (value) {
     xs = ~~Math.cbrt(amt);
     ys = xs;
     zs = xs;
-    setup();
+    _setup();
 });
 settings.addBoolean("Diagonal movement", true, function (value) {
     DIAGONALS = value;
 });
 settings.addRange("Max Walls", 0, 100, 10, 1, function (value) {
     MAXWALLS = value;
-    setup();
+    _setup();
 });
 settings.addRange("Min Walls", 0, 100, 10, 1, function (value) {
     MINWALLS = value;
-    setup();
+    _setup();
 });
 settings.addRange("Size <br> (drawn at, not shown at)", 6, 50, 10, 1, function (
     value
@@ -73,15 +73,20 @@ settings.addButton("Reset angle", function () {
 });
 
 function setup() {
+    createCanvas(window.innerWidth, window.innerHeight, WEBGL);
+    setAttributes("antialias", true);
+    document.oncontextmenu = () => false;
+
+    _setup();
+}
+
+function _setup() {
     nodes = [];
     for (var j = 0; j < amt; j++) {
         nodes[j] = ["a"];
     }
 
-    createCanvas(window.innerWidth, window.innerHeight, WEBGL);
-    setAttributes("antialias", true);
     createEasyCam({ distance: width });
-    document.oncontextmenu = () => false;
 
     for (
         var i = 0;
