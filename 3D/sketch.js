@@ -23,7 +23,7 @@ var gizmo = 1,
 var settings = QuickSettings.create();
 settings.addButton("Run", run);
 settings.addButton("Step", go);
-settings.addButton("Re-Generate", _setup);
+settings.addButton("Re-Generate", generate);
 settings.addButton("Reset map", reset);
 settings.addBoolean("Draw gizmo", true, function (value) {
     gizmo = value;
@@ -46,18 +46,18 @@ settings.addRange("Map size (blocks³)", 1, 30, 10, 1, function (value) {
     xs = ~~Math.cbrt(amt);
     ys = xs;
     zs = xs;
-    _setup();
+    generate();
 });
 settings.addBoolean("Diagonal movement", true, function (value) {
     DIAGONALS = value;
 });
 settings.addRange("Max Walls", 0, 100, 10, 1, function (value) {
     MAXWALLS = value;
-    _setup();
+    generate();
 });
 settings.addRange("Min Walls", 0, 100, 10, 1, function (value) {
     MINWALLS = value;
-    _setup();
+    generate();
 });
 settings.addRange("Size <br> (drawn at, not shown at)", 6, 50, 10, 1, function (
     value
@@ -77,11 +77,10 @@ function setup() {
     setAttributes("antialias", true);
     document.oncontextmenu = () => false;
     createEasyCam({ distance: width });
-
-    _setup();
+    generate();
 }
 
-function _setup() {
+function generate() {
     nodes = [];
     for (var j = 0; j < amt; j++) {
         nodes[j] = ["a"];
