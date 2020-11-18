@@ -4,8 +4,11 @@ var ys = xs;
 var zs = xs;
 var MAXWALLS = 10;
 var MINWALLS = 10;
-var DIAGONALS = 0;
+var MINDIST = 5;
+var DIAGONALS = 1;
 var size = 10;
+var theta = 0;
+var spin = 0;
 
 var nodes = [];
 
@@ -28,7 +31,7 @@ settings.addBoolean("Draw empty space", false, function (value) {
     drawEmpty = value;
 });
 settings.addRange(
-    "Run speed <br> (ms bettween steps)",
+    "Run speed <br> (ms between steps)",
     1,
     2000,
     100,
@@ -37,7 +40,7 @@ settings.addRange(
         interval = value;
     }
 );
-settings.addRange("Map size", 1, 20, 10, 1, function (value) {
+settings.addRange("Map size (blocks³)", 1, 30, 10, 1, function (value) {
     amt = Math.pow(value, 3);
     xs = ~~Math.cbrt(amt);
     ys = xs;
@@ -59,6 +62,10 @@ settings.addRange("Size <br> (drawn at, not shown at)", 6, 50, 10, 1, function (
     value
 ) {
     size = value;
+});
+settings.addBoolean("Rotate", 0, function (value) {
+    theta = 0;
+    spin = value;
 });
 
 function setup() {
@@ -95,6 +102,18 @@ function setup() {
     nodes[finnish][0] = "e";
 
     start = ~~(Math.random() * amt);
+    while (
+        dist(
+            locate(start).x,
+            locate(start).y,
+            locate(start).z,
+            locate(finnish).x,
+            locate(finnish).y,
+            locate(finnish).z
+        ) < MINDIST
+    ) {
+        start = ~~(Math.random() * amt);
+    }
     nodes[start][0] = "b";
     var x = locate(start).x;
     var y = locate(start).y;
@@ -103,6 +122,11 @@ function setup() {
 }
 
 function draw() {
+    if (spin) {
+        rotateY(theta);
+        theta += 0.005;
+    }
+
     background(230);
 
     // gizmo
