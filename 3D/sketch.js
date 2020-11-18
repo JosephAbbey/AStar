@@ -1,7 +1,7 @@
 var amt = 1000;
-var xs = ~~Math.cbrt(amt);
-var ys = xs;
-var zs = xs;
+xs = ~~Math.cbrt(amt);
+ys = xs;
+zs = xs;
 var MAXWALLS = 10;
 var MINWALLS = 10;
 var MINDIST = 5;
@@ -24,6 +24,7 @@ var settings = QuickSettings.create();
 settings.addButton("Run", run);
 settings.addButton("Step", go);
 settings.addButton("Re-Generate", setup);
+settings.addButton("Reset map", reset);
 settings.addBoolean("Draw gizmo", true, function (value) {
     gizmo = value;
 });
@@ -77,12 +78,7 @@ function setup() {
         nodes[j] = ["a"];
     }
 
-    if (window.innerHeight <= window.innerWidth) {
-        createCanvas(window.innerHeight, window.innerHeight, WEBGL);
-    }
-    if (window.innerHeight > window.innerWidth) {
-        createCanvas(window.innerWidth, window.innerWidth, WEBGL);
-    }
+    createCanvas(window.innerWidth, window.innerHeight, WEBGL);
     setAttributes("antialias", true);
     createEasyCam({ distance: width });
     document.oncontextmenu = () => false;
@@ -117,7 +113,7 @@ function setup() {
     ) {
         start = ~~(Math.random() * amt);
     }
-    nodes[start][0] = "b";
+    nodes[start][0] = "sb";
     var x = locate(start).x;
     var y = locate(start).y;
     var z = locate(start).z;
@@ -163,7 +159,7 @@ function draw() {
         } else if (nodes[i][0] == "e" || nodes[i][0] == "ce") {
             fill(255, 0, 255);
         }
-        if (nodes[i][0] == "b") {
+        if (nodes[i][0] == "b" || nodes[i][0] == "sb") {
             fill(0, 0, 255);
         } else if (nodes[i][0] == "d") {
             fill(0, 0, 0);
@@ -269,74 +265,17 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function getNeighbours(nodes, x, y, z) {
-    var neighbours = [];
-
-    for (var j = -1; j <= 1; j++) {
-        for (var k = -1; k <= 1; k++) {
-            for (var l = -1; l <= 1; l++) {
-                if (
-                    (j === -1 && x === 0) ||
-                    (j === 1 && x === xs - 1) ||
-                    (k === -1 && y === 0) ||
-                    (k === 1 && y === ys - 1) ||
-                    (l === -1 && z === 0) ||
-                    (l === 1 && z === zs - 1)
-                ) {
-                    neighbours.push(null);
-                } else {
-                    neighbours.push(x + j + (y + k) * xs + (z + l) * ys * xs);
-                }
-            }
+function reset() {
+    for (var i = 0; i < nodes.length; i++) {
+        if (i == start) {
+            nodes[i][0] = "sb";
+        }
+        if (i == finnish) {
+            nodes[i][0] = "e";
+        }
+        if (nodes[i][0] == "b" || nodes[i][0] == "c" || nodes[i][0] == "p") {
+            nodes[i][0] = "a";
         }
     }
-
-    if (DIAGONALS) {
-        for (var i = 0; i < 27; i++) {
-            if (nodes[neighbours[i]]) {
-                if (nodes[neighbours[i]][0] == "a") {
-                    nodes[neighbours[i]][0] = "c";
-                    nodes[neighbours[i]][5] = x + y * xs + z * ys * xs;
-                }
-                if (nodes[neighbours[i]][0] == "e") {
-                    nodes[neighbours[i]][0] = "ce";
-                    nodes[neighbours[i]][5] = x + y * xs + z * ys * xs;
-                }
-            }
-        }
-    } else {
-        for (var i = 0; i < 6; i++) {
-            var j = 0;
-            switch (i) {
-                case 0:
-                    j = 4;
-                    break;
-                case 1:
-                    j = 10;
-                    break;
-                case 2:
-                    j = 12;
-                    break;
-                case 3:
-                    j = 14;
-                    break;
-                case 4:
-                    j = 16;
-                    break;
-                case 5:
-                    j = 22;
-                    break;
-            }
-            if (nodes[neighbours[j]]) {
-                if (nodes[neighbours[j]][0] == "a") {
-                    nodes[neighbours[j]][0] = "c";
-                    nodes[neighbours[j]][5] = x + y * xs + z * ys * xs;
-                }
-                if (nodes[neighbours[j]][0] == "e") {
-                    nodes[neighbours[j]][0] = "ce";
-                    nodes[neighbours[j]][5] = x + y * xs + z * ys * xs;
-                }
-            }
-        }
-    }
+    getNeighbours(nodes, locate(start).x, locate(start).y, locate(start).z);
 }
