@@ -46,17 +46,21 @@ settings.addRange("Map size (blocks³)", 1, 30, 10, 1, (value) => {
     xs = ~~Math.cbrt(amt);
     ys = xs;
     zs = xs;
+    settings.setRangeParameters("Max Walls", MINWALLS, value * 30);
+    settings.setRangeParameters("Min Walls", 0, value * 30);
     generate();
 });
 settings.addBoolean("Diagonal movement", true, (value) => {
     DIAGONALS = value;
 });
-settings.addRange("Max Walls", 0, 100, 10, 1, (value) => {
+settings.addRange("Max Walls", 10, 300, 10, 1, (value) => {
     MAXWALLS = value;
+    settings.setRangeParameters("Min Walls", 0, value);
     generate();
 });
-settings.addRange("Min Walls", 0, 100, 10, 1, (value) => {
+settings.addRange("Min Walls", 0, 300, 10, 1, (value) => {
     MINWALLS = value;
+    settings.setRangeParameters("Max Walls", value, xs * 30);
     generate();
 });
 settings.addRange(
