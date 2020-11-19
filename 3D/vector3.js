@@ -85,3 +85,35 @@ function getNeighbours(nodes, x, y, z) {
         }
     }
 }
+
+function getPath(nodes, start, finnish) {
+    var cur = finnish;
+    while (cur !== start) {
+        nodes[cur][0] = "p";
+        cur = nodes[cur][5];
+    }
+    nodes[cur][0] = "p";
+    draw();
+}
+
+function calc(nodes) {
+    var best = [Infinity, Infinity, Infinity, Infinity, Infinity];
+    for (var i = 0; i < nodes.length; i++) {
+        if (
+            nodes[i][3] < best[3] &&
+            (nodes[i][0] == "c" || nodes[i][0] == "ce")
+        ) {
+            best = nodes[i];
+            best[4] = i;
+        }
+        if (
+            nodes[i][3] == best[3] &&
+            nodes[i][1] < best[1] &&
+            (nodes[i][0] == "c" || nodes[i][0] == "ce")
+        ) {
+            best = nodes[i];
+            best[4] = i;
+        }
+    }
+    return best;
+}

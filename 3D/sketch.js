@@ -1,3 +1,4 @@
+//  Variables
 var amt = 1000;
 xs = ~~Math.cbrt(amt);
 ys = xs;
@@ -18,8 +19,11 @@ var finnish;
 var best;
 var calculated = [];
 var gizmo = 1,
-    drawEmpty = 0;
+    drawEmpty = 0,
+    onlyPath = 0,
+    tblack = 1;
 
+// Settings Pannel
 var settings = QuickSettings.create();
 settings.addButton("Run", run);
 settings.addButton("Step", go);
@@ -28,8 +32,14 @@ settings.addButton("Reset map", reset);
 settings.addBoolean("Draw gizmo", true, (value) => {
     gizmo = value;
 });
-settings.addBoolean("Draw empty space", false, (value) => {
+settings.addBoolean("Show empty space", false, (value) => {
     drawEmpty = value;
+});
+settings.addBoolean("Only show path", false, (value) => {
+    onlyPath = value;
+});
+settings.addBoolean("Transparent black blocks", true, (value) => {
+    tblack = value;
 });
 settings.addRange(
     "Run speed <br> (ms between steps)",
@@ -81,6 +91,7 @@ settings.addButton("Reset angle", () => {
     theta = 0;
 });
 
+// Rendering
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
     setAttributes("antialias", true);
@@ -89,6 +100,75 @@ function setup() {
     generate();
 }
 
+function draw() {
+    background(230);
+
+    rotateY(theta);
+    if (spin) {
+        theta += 0.005;
+    }
+
+    // gizmo
+    if (gizmo) {
+        strokeWeight(1);
+        stroke(255, 32, 0);
+        line(0, 0, 0, xs * (size * 2), 0, 0);
+        stroke(32, 255, 32);
+        line(0, 0, 0, 0, ys * (size * 2), 0);
+        stroke(0, 32, 255);
+        line(0, 0, 0, 0, 0, zs * (size * 2));
+
+        noFill();
+        stroke(255, 0, 255);
+        box(size * 2 * xs);
+    }
+
+    for (var i = 0; i < nodes.length; i++) {
+        noStroke();
+
+        var x = locate(i).x;
+        var y = locate(i).y;
+        var z = locate(i).z;
+        if (nodes[i][0] == "a") {
+            fill(255, 255, 255);
+            if (!drawEmpty) {
+                noFill();
+            }
+        } else if (nodes[i][0] == "c") {
+            fill(255, 0, 0);
+            if (onlyPath) {
+                noFill();
+            }
+        } else if (nodes[i][0] == "e" || nodes[i][0] == "ce") {
+            fill(255, 0, 255);
+        }
+        if (nodes[i][0] == "b" || nodes[i][0] == "sb") {
+            fill(0, 0, 255);
+            if (calculated[4] == finnish && onlyPath) {
+                noFill();
+            }
+        } else if (nodes[i][0] == "d") {
+            if (tblack) {
+                fill(0, 0, 0, 50);
+            } else {
+                fill(0, 0, 0);
+            }
+        } else if (nodes[i][0] == "p") {
+            fill(0, 255, 0);
+        }
+
+        push();
+        translate(
+            (x + 0.75) * (size * 2) - xs / 2 - size * xs,
+            (y + 0.75) * (size * 2) - ys / 2 - size * ys,
+            (z + 0.75) * (size * 2) - zs / 2 - size * zs
+        );
+        box(size);
+        pop();
+    }
+}
+
+// Map generation
 function generate() {
     nodes = [];
     for (var j = 0; j < amt; j++) {
@@ -126,97 +206,30 @@ function generate() {
         start = ~~(Math.random() * amt);
     }
     nodes[start][0] = "sb";
-    var x = locate(start).x;
-    var y = locate(start).y;
-    var z = locate(start).z;
-    getNeighbours(nodes, x, y, z);
+    getNeighbours(nodes, locate(start).x, locate(start).y, locate(start).z);
 }
 
-function draw() {
-    rotateY(theta);
-    if (spin) {
-        theta += 0.005;
-    }
-
-    background(230);
-
-    // gizmo
-    if (gizmo) {
-        strokeWeight(1);
-        stroke(255, 32, 0);
-        line(0, 0, 0, xs * (size * 2), 0, 0);
-        stroke(32, 255, 32);
-        line(0, 0, 0, 0, ys * (size * 2), 0);
-        stroke(0, 32, 255);
-        line(0, 0, 0, 0, 0, zs * (size * 2));
-
-        noFill();
-        stroke(255, 0, 255);
-        box(size * 2 * xs);
-    }
-
+function reset() {
     for (var i = 0; i < nodes.length; i++) {
-        noStroke();
-
-        var x = locate(i).x;
-        var y = locate(i).y;
-        var z = locate(i).z;
-        if (nodes[i][0] == "a") {
-            fill(255, 255, 255);
-            if (!drawEmpty) {
-                noFill();
-            }
-        } else if (nodes[i][0] == "c") {
-            fill(255, 0, 0);
-        } else if (nodes[i][0] == "e" || nodes[i][0] == "ce") {
-            fill(255, 0, 255);
+        if (i == start) {
+            nodes[i][0] = "sb";
         }
-        if (nodes[i][0] == "b" || nodes[i][0] == "sb") {
-            fill(0, 0, 255);
-        } else if (nodes[i][0] == "d") {
-            fill(0, 0, 0);
-        } else if (nodes[i][0] == "p") {
-            fill(0, 255, 0);
+        if (i == finnish) {
+            nodes[i][0] = "e";
         }
-
-        push();
-        translate(
-            (x + 0.75) * (size * 2) - xs / 2 - size * xs,
-            (y + 0.75) * (size * 2) - ys / 2 - size * ys,
-            (z + 0.75) * (size * 2) - zs / 2 - size * zs
-        );
-        box(size);
-        pop();
+        if (nodes[i][0] == "b" || nodes[i][0] == "c" || nodes[i][0] == "p") {
+            nodes[i][0] = "a";
+        }
     }
+    getNeighbours(nodes, locate(start).x, locate(start).y, locate(start).z);
 }
 
+// Events
 async function run() {
     while (calculated[4] != finnish) {
         go();
         await sleep(interval);
     }
-}
-
-function calc(nodes) {
-    best = [Infinity, Infinity, Infinity, Infinity, Infinity];
-    for (var i = 0; i < nodes.length; i++) {
-        if (
-            nodes[i][3] < best[3] &&
-            (nodes[i][0] == "c" || nodes[i][0] == "ce")
-        ) {
-            best = nodes[i];
-            best[4] = i;
-        }
-        if (
-            nodes[i][3] == best[3] &&
-            nodes[i][1] < best[1] &&
-            (nodes[i][0] == "c" || nodes[i][0] == "ce")
-        ) {
-            best = nodes[i];
-            best[4] = i;
-        }
-    }
-    return best;
 }
 
 function go() {
@@ -259,38 +272,10 @@ function go() {
         // setTimeout(function () {
         //     alert("Yay the Path is Found!!");
         // }, 3);
-        getPath();
+        getPath(nodes, start, finnish);
     }
-}
-
-function getPath() {
-    var cur = finnish;
-    while (cur !== start) {
-        nodes[cur][0] = "p";
-        cur = nodes[cur][5];
-    }
-    nodes[cur][0] = "p";
-    draw();
 }
 
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function reset() {
-    for (var i = 0; i < nodes.length; i++) {
-        if (i == start) {
-            nodes[i][0] = "sb";
-        }
-        if (i == finnish) {
-            nodes[i][0] = "e";
-        }
-        if (nodes[i][0] == "b" || nodes[i][0] == "c" || nodes[i][0] == "p") {
-            nodes[i][0] = "a";
-        }
-    }
-    var x = locate(start).x;
-    var y = locate(start).y;
-    var z = locate(start).z;
-    getNeighbours(nodes, x, y, z);
 }
