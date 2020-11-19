@@ -3,7 +3,7 @@ const rows = ~~Math.sqrt(amt);
 const columns = rows;
 const MAXWALLS = 100;
 const MINWALLS = 75;
-const interval = 0;
+const interval = 10;
 const DIAGONALS = 1;
 
 var nodes = [];

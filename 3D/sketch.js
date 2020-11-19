@@ -285,5 +285,8 @@ function reset() {
             nodes[i][0] = "a";
         }
     }
-    getNeighbours(nodes, locate(start).x, locate(start).y, locate(start).z);
+    var x = locate(start).x;
+    var y = locate(start).y;
+    var z = locate(start).z;
+    getNeighbours(nodes, x, y, z);
 }
