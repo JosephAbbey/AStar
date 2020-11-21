@@ -96,7 +96,7 @@ function setup() {
     createCanvas(window.innerWidth, window.innerHeight, WEBGL);
     setAttributes("antialias", true);
     document.oncontextmenu = () => false;
-    createEasyCam({ distance: width });
+    EasyCam = createEasyCam({ distance: width });
     generate();
 }
 
